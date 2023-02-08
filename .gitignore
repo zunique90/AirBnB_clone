@@ -3,3 +3,4 @@
 *.pyc
 __pycache__/
 playground.py
+file.json
