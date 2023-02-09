@@ -56,7 +56,6 @@ class HBNBCommand(cmd.Cmd):
         """Prints the string representation of an instance
         based on the class name and id"""
         args_list = self.parse_args(args)
-        print(args_list)
         if not args_list: # i.e. no extra argument was passed
             print("** class name missing **")
         elif len(args_list) != 2:
@@ -65,7 +64,7 @@ class HBNBCommand(cmd.Cmd):
         elif args_list[0] != 'BaseModel':
             print("** class doesn't exist **")
         else:
-            [model_name, model_id] = args_list
+            [model_name, moodel_id] = args_list
             models = storage.all()
             key = "{}.{}".format(model_name, model_id)
             if key in models:
@@ -79,6 +78,31 @@ class HBNBCommand(cmd.Cmd):
 
         print("Prints the string representation of an instance",
         "based on the class name and id")
+
+    def do_all(self, args):
+        """Prints all string representation of all instances
+        based on the class name passed as an argument.
+        Default class name is BaseModel"""
+
+        args_list = self.parse_args(args)
+
+        if args and args_list[0] != 'BaseModel':
+            print("** class doesn't exist **")
+        else:
+            model_dict = storage.all()
+            model_list = []
+            for model_key, model_data in model_dict.items():
+                model = BaseModel(**model_data)
+                model_list.append(str(model))
+
+            print(model_list)
+
+    def help_all(self):
+        """Prints the help text for the all command"""
+
+        print("Prints all string representation of all instances",
+        "based on the class name passed as an argument.",
+        "Default class name is BaseModel")
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
