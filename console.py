@@ -12,26 +12,38 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
 
     def do_quit(self, arg):
-        """Quits the terminal"""
+        """
+        Quits the terminal
+
+        Usage: quit
+        """
         # self.close()
         return True
 
     def help_quit(self):
         """Prints the helper text for the quit command"""
-        print("Quit command to exit the program")
+        print("Quit command to exit the program\n")
 
     def do_EOF(self, arg):
-        """Quits the terminal"""
+        """
+        Quits the terminal
+
+        Usage: EOF
+        """
         # self.close()
         return True
 
     def help_EOF(self):
         """Prints the helper text for the EOF command"""
-        print("Quit command to exit the program")
+        print("Quit command to exit the program\n")
 
     def do_create(self, args):
-        """Creates a new instance of BaseModel
-        saves it (to the JSON file) and prints the id"""
+        """
+        Creates a new instance of BaseModel saves it (to the JSON file)
+        Also, prints the id
+
+        Usage: create BaseModel
+        """
         if not args:
             print("** class name missing **")
         elif args != 'BaseModel':
@@ -44,17 +56,24 @@ class HBNBCommand(cmd.Cmd):
 
     def help_create(self):
         """Prints the helper text for the create command"""
-        print("Creates a new instance of BaseModel, saves it",
-        "(to the JSON file) and prints the id")
+
+        print("Creates a new instance of BaseModel saves it (to the JSON file).",
+              "Also, prints the id.\n", "Usage: create BaseModel\n", sep='\n')
 
     def parse_args(self, args):
-        """Parses the argument passed with command,
-        returns a list of the arguments"""
+        """
+        Parses the argument passed with command,
+        returns a list of the arguments
+        """
         return args.split()
 
     def do_show(self, args):
-        """Prints the string representation of an instance
-        based on the class name and id"""
+        """
+        Prints the string representation of an instance
+        based on the class name and id
+
+        Usage: show <classname> <id>
+        """
         args_list = self.parse_args(args)
         if not args_list: # i.e. no extra argument was passed
             print("** class name missing **")
@@ -64,7 +83,7 @@ class HBNBCommand(cmd.Cmd):
         elif args_list[0] != 'BaseModel':
             print("** class doesn't exist **")
         else:
-            [model_name, moodel_id] = args_list
+            [model_name, model_id] = args_list
             models = storage.all()
             key = "{}.{}".format(model_name, model_id)
             if key in models:
@@ -76,13 +95,17 @@ class HBNBCommand(cmd.Cmd):
     def help_show(self):
         """Prints the helper text for the show command"""
 
-        print("Prints the string representation of an instance",
-        "based on the class name and id")
+        print("Prints the string representation of an instance based on the \
+        class name and id\n", "Usage: show <classname> <id>\n", sep='\n')
 
     def do_all(self, args):
-        """Prints all string representation of all instances
-        based on the class name passed as an argument.
-        Default class name is BaseModel"""
+        """
+        Prints all string representation of all instances
+        based on the classname passed as an argument.
+
+        Usage: all <classname>
+        Classname is optional, default is BaseModel
+        """
 
         args_list = self.parse_args(args)
 
@@ -100,9 +123,9 @@ class HBNBCommand(cmd.Cmd):
     def help_all(self):
         """Prints the help text for the all command"""
 
-        print("Prints all string representation of all instances",
-        "based on the class name passed as an argument.",
-        "Default class name is BaseModel")
+        print("Prints all string representation of all instances based on the \
+        classname passed as an argument.\n", "Usage: all <classname>",
+              "Classname is optional, default is BaseModel\n", sep='\n')
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
