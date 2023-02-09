@@ -2,6 +2,7 @@
 # This is the entry point to the console made for the AirBnB clone
 
 import cmd
+from models import storage
 from models.base_model import BaseModel
 
 
@@ -16,7 +17,7 @@ class HBNBCommand(cmd.Cmd):
         return True
 
     def help_quit(self):
-        """Prints the helper test for the quit command"""
+        """Prints the helper text for the quit command"""
         print("Quit command to exit the program")
 
     def do_EOF(self, arg):
@@ -25,7 +26,7 @@ class HBNBCommand(cmd.Cmd):
         return True
 
     def help_EOF(self):
-        """Prints the helper test for the EOF command"""
+        """Prints the helper text for the EOF command"""
         print("Quit command to exit the program")
 
     def do_create(self, args):
@@ -42,9 +43,42 @@ class HBNBCommand(cmd.Cmd):
             print(model.id)
 
     def help_create(self):
-        """Prints the helper test for the create command"""
+        """Prints the helper text for the create command"""
         print("Creates a new instance of BaseModel, saves it",
         "(to the JSON file) and prints the id")
+
+    def parse_args(self, args):
+        """Parses the argument passed with command,
+        returns a list of the arguments"""
+        return args.split()
+
+    def do_show(self, args):
+        """Prints the string representation of an instance
+        based on the class name and id"""
+        args_list = self.parse_args(args)
+        print(args_list)
+        if not args_list: # i.e. no extra argument was passed
+            print("** class name missing **")
+        elif len(args_list) != 2:
+            # i.e. extra arguments were given but not up to or less than 2 (no id)
+            print("** instance id missing **")
+        elif args_list[0] != 'BaseModel':
+            print("** class doesn't exist **")
+        else:
+            [model_name, model_id] = args_list
+            models = storage.all()
+            key = "{}.{}".format(model_name, model_id)
+            if key in models:
+                model = BaseModel(models[key])
+                print(model)
+            else:
+                print("** no instance found **")
+
+    def help_show(self):
+        """Prints the helper text for the show command"""
+
+        print("Prints the string representation of an instance",
+        "based on the class name and id")
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
