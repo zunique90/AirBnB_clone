@@ -42,8 +42,22 @@ class FileStorage:
             self.__objects[key] = objekt.to_dict()
 
     def all(self):
-        """Returns all objects in the storage"""
+        """
+        Gets all object in storage
+        Returns:
+            A dictionary containing all object in storage
+        """
         return self.__objects
+
+    def get_all(self, _name):
+        """
+        Returns all objects in the storage that belongs to the `name` model
+        Arguments:
+            _name: the name of the model
+        Returns:
+            A dictionary containing all object under the model `name`
+        """
+        return {k: v for k, v in self.__objects.items() if _name in k}
 
     def new(self, objekt):
         """
@@ -90,18 +104,22 @@ class FileStorage:
                 break
         return obj_in_storage
 
-    def get_object(self, object_id, object_classname):
+    def get_object(self, object_id=None, object_classname=None, key=None):
         """
         Gets object from storage with key of object_key.
+        Or generates key from object_id and object_classname
         Arguments:
             object_id: The object's id
             object_classname: The object's class name
+            (string) key: the key of the object
         Returns:
-            An None if object doesn't exists else the object's data
+            None if object doesn't exists else the object's data
         """
-        if self.in_storage(object_id, object_classname):
-            object_key = self.generate_key(object_id, object_classname)
-            return self.__objects[object_key]
+        if not key and (object_id and object_classname):
+            key = self.generate_key(object_id, object_classname)
+
+        if self.in_storage(key=key):
+            return self.__objects[key]
         return None
 
     def destroy_object(self, key):

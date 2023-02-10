@@ -4,12 +4,48 @@
 import cmd
 from models import storage
 from models.base_model import BaseModel
+from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
 
 
 class HBNBCommand(cmd.Cmd):
     """This class controls the features of the AirBnB console"""
 
     prompt = '(hbnb) '
+    __default_model = 'BaseModel'
+    __models= {
+        'BaseModel': BaseModel,
+        'User': User,
+        'State': State,
+        'City': City,
+        'Amenity': Amenity,
+        'Place': Place,
+        'Review': Review
+    }
+
+    def use_model(self, _name, *args, **kwargs):
+        """
+        Gets the right model to be used based on _name
+        Arguments:
+            (string) _name: the name of the model we need to use
+        Returns:
+            An instance of the model
+        """
+        return self.__models[_name](*args, **kwargs)
+
+    def model_exists(self, name):
+        """
+        Checks if a model exists
+        Arguments:
+            name: the name of the model
+        Returns:
+            True if model exists else False
+        """
+        return name in self.__models
 
     def do_quit(self, arg):
         """
@@ -46,11 +82,10 @@ class HBNBCommand(cmd.Cmd):
         """
         if not args:
             print("** class name missing **")
-        elif args != 'BaseModel':
-            print(BaseModel.__class__.__name__)
+        elif not self.model_exists(args):
             print("** class doesn't exist **")
         else:
-            model = BaseModel()
+            model = self.use_model(args)
             model.save()
             print(model.id)
 
@@ -78,15 +113,15 @@ class HBNBCommand(cmd.Cmd):
         if not args_list: # i.e. no extra argument was passed
             print("** class name missing **")
         elif len(args_list) != 2:
-            # i.e. extra arguments were given but not up to or less than 2 (no id)
+            # i.e. extra arguments were given but greater or less than 2 (no id)
             print("** instance id missing **")
-        elif args_list[0] != 'BaseModel':
+        elif not self.model_exists(args_list[0]):
             print("** class doesn't exist **")
         else:
             [model_name, model_id] = args_list
             model_data = storage.get_object(model_id, model_name)
             if model_data:
-                model = BaseModel(**model_data)
+                model = self.use_model(model_name, **model_data)
                 print(model)
             else:
                 print("** no instance found **")
@@ -108,10 +143,16 @@ class HBNBCommand(cmd.Cmd):
 
         args_list = self.parse_args(args)
 
-        if args and args_list[0] != 'BaseModel':
+        model_name = self.__default_model
+        if args and isinstance(args_list, list):
+            print('is list')
+            model_name = args_list[0]
+
+        if args and not self.model_exists(model_name):
             print("** class doesn't exist **")
         else:
-            model_list = [str(BaseModel(**model)) for model in storage.all().values()]
+            model_list = [str(self.use_model(model_name, **model_data))
+                          for model_data in storage.get_all(model_name).values()]
             print(model_list)
 
     def help_all(self):
@@ -132,7 +173,7 @@ class HBNBCommand(cmd.Cmd):
 
         if not args_list: # No extra arguments were passed, i.e. no classname
             print("** class name missing **")
-        elif args_list[0] != 'BaseModel':
+        elif not self.model_exists(args_list[0]):
             print("** class doesn't exist **")
         elif len(args_list) < 2: # i.e. id wasn't provided
             print("** instance id missing **")
@@ -146,10 +187,11 @@ class HBNBCommand(cmd.Cmd):
 
             [model_name, model_id, attr_name, value] = args_list[:4]
 
-            model_data = storage.get_object(model_id, model_name)
+            key = storage.generate_key(model_id, model_name)
+            model_data = storage.get_object(key=key)
             if model_data:
                 if attr_name not in IGNORE:
-                    model = BaseModel(**model_data)
+                    model = self.use_model(model_name, **model_data)
                     setattr(model, attr_name, value)
                     model.save()
             else:
@@ -173,7 +215,7 @@ class HBNBCommand(cmd.Cmd):
 
         if not args_list: # No extra arguments were passed, i.e. no classname
             print("** class name missing **")
-        elif args_list[0] != 'BaseModel':
+        elif not self.model_exists(args_list[0]):
             print("** class doesn't exist **")
         elif len(args_list) < 2: # i.e. id wasn't provided
             print("** instance id missing **")
@@ -193,5 +235,6 @@ class HBNBCommand(cmd.Cmd):
 
         Usage: destroy <class name> <id>
         """)
+
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
