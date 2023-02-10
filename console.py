@@ -58,7 +58,7 @@ class HBNBCommand(cmd.Cmd):
         """Prints the helper text for the create command"""
 
         print("Creates a new instance of BaseModel saves it (to the JSON file).",
-              "Also, prints the id.\n", "Usage: create BaseModel\n", sep='\n')
+              "Also, prints the id.\n\t", "Usage: create BaseModel\n", sep='\n')
 
     def parse_args(self, args):
         """
@@ -84,10 +84,9 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
         else:
             [model_name, model_id] = args_list
-            models = storage.all()
-            key = "{}.{}".format(model_name, model_id)
-            if key in models:
-                model = BaseModel(models[key])
+            model_data = storage.get_object(model_id, model_name)
+            if model_data:
+                model = BaseModel(**model_data)
                 print(model)
             else:
                 print("** no instance found **")
@@ -96,7 +95,7 @@ class HBNBCommand(cmd.Cmd):
         """Prints the helper text for the show command"""
 
         print("Prints the string representation of an instance based on the \
-        class name and id\n", "Usage: show <classname> <id>\n", sep='\n')
+        class name and id\n\t", "Usage: show <classname> <id>\n", sep='\n')
 
     def do_all(self, args):
         """
@@ -112,20 +111,87 @@ class HBNBCommand(cmd.Cmd):
         if args and args_list[0] != 'BaseModel':
             print("** class doesn't exist **")
         else:
-            model_dict = storage.all()
-            model_list = []
-            for model_key, model_data in model_dict.items():
-                model = BaseModel(**model_data)
-                model_list.append(str(model))
-
+            model_list = [str(BaseModel(**model)) for model in storage.all().values()]
             print(model_list)
 
     def help_all(self):
         """Prints the help text for the all command"""
 
         print("Prints all string representation of all instances based on the \
-        classname passed as an argument.\n", "Usage: all <classname>",
+        classname passed as an argument.\n\t", "Usage: all <classname>",
               "Classname is optional, default is BaseModel\n", sep='\n')
 
+    def do_update(self, args):
+        """
+        Updates an instance based on the class name and id by adding or updating attribute
+
+        Usage: update <class name> <id> <attribute name> "<attribute value>"
+        """
+
+        args_list = self.parse_args(args)
+
+        if not args_list: # No extra arguments were passed, i.e. no classname
+            print("** class name missing **")
+        elif args_list[0] != 'BaseModel':
+            print("** class doesn't exist **")
+        elif len(args_list) < 2: # i.e. id wasn't provided
+            print("** instance id missing **")
+        elif len(args_list) < 3: # i.e. attribute name wasn't provided
+            print("** attribute name missing **")
+        elif len(args_list) < 4: # i.e. value wasn't provided
+            print("** value missing **")
+        else:
+
+            IGNORE = ['id', 'created_at', 'updated_at']
+
+            [model_name, model_id, attr_name, value] = args_list[:4]
+
+            model_data = storage.get_object(model_id, model_name)
+            if model_data:
+                if attr_name not in IGNORE:
+                    model = BaseModel(**model_data)
+                    setattr(model, attr_name, value)
+                    model.save()
+            else:
+                print("** no instance found **")
+
+    def help_update(self):
+        """Prints the help text for the update command"""
+
+        print('Updates an instance based on the class name and id by adding or \
+        updating attribute\n\t', 'Usage: update <class name> <id> \
+        <attribute name> "<attribute value>"\n', sep='\n')
+
+    def do_destroy(self, args):
+        """
+        Deletes an instance based on the class name and id
+
+        Usage: destroy <class name> <id>
+        """
+
+        args_list = self.parse_args(args)
+
+        if not args_list: # No extra arguments were passed, i.e. no classname
+            print("** class name missing **")
+        elif args_list[0] != 'BaseModel':
+            print("** class doesn't exist **")
+        elif len(args_list) < 2: # i.e. id wasn't provided
+            print("** instance id missing **")
+        else:
+
+            [model_name, model_id] = args_list
+            key = storage.generate_key(model_id, model_name)
+            status = storage.destroy_object(key)
+            if not status: # i.e. unable to delete object
+                print("** no instance found **")
+
+    def help_destroy(self):
+        """Prints the help text for the destroy command"""
+
+        print("""
+        Deletes an instance based on the class name and id
+
+        Usage: destroy <class name> <id>
+        """)
 if __name__ == '__main__':
     HBNBCommand().cmdloop()

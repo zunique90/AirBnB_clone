@@ -50,9 +50,8 @@ class BaseModel:
     def save(self):
         """Saves the model instance"""
         self.updated_at = datetime.now()
-        key = "{}.{}".format(self.__class__.__name__, self.id)
         # Update the value in storage before saving the storage to file
-        storage.update_object(key, self.to_dict())
+        storage.update_object(self)
         storage.save()
 
     def to_dict(self):
