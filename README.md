@@ -1,6 +1,6 @@
 # AirBnB Clone
 ## Description
-This is a simple AirBnB clone built on python. The project is still ongoing, presently models have been created for the airbnb products and a file storage system is incoprorated to persist data through sessions and a console have been built with basic commands to help users interact with the storage system.
+This is a simple AirBnB clone built on python. The project is still ongoing, presently models have been created for the airbnb products, a file storage system is incoprorated to persist data through sessions and a console have been built with basic commands to help users interact with the storage system.
 
 ## How to start the console
 To start the console, follow these steps:
@@ -43,7 +43,7 @@ To start the console, follow these steps:
 ```
 5. all
 
-   Prints all string representation of all instances based on the classname passed as an argument.
+   Prints the string representation of all instances based on the classname passed as an argument.
 ```
    Usage:
 
@@ -54,7 +54,7 @@ To start the console, follow these steps:
 6. update
 
    Updates an instance based on the class name and id by adding or updating attribute.
-   when ``id``, ``created_at``, ``updated_at`` are passed as attribute name, no update action is carried out as these attributes cannot be updated.
+   When ``id``, ``created_at``, ``updated_at`` are passed as attribute name, no update action is carried out as these attributes cannot be updated.
 ```
    Usage:
 
@@ -69,7 +69,7 @@ To start the console, follow these steps:
 	(hbnb) destroy <class name> <id>
 ```
 ## Extras
-For now, the classnames recognised by the console are BaseModel, User, State, City, Amenity, Place, and Review. The console is case-sensitive, so these names, when used, should be used exactly as seen.
+For now, the classnames recognised by the console are _*BaseModel*_, _*User*_, _*State*_, _*City*_, _*Amenity*_, _*Place*_, and _*Review*_. The console is case-sensitive, so these names, when used, should be used exactly as seen.
 ## Contributors
 [Jerry Wonder](https://github.com/JerryWonder2126)
 
