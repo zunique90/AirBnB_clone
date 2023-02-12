@@ -78,7 +78,7 @@ class HBNBCommand(cmd.Cmd):
         Creates a new instance of BaseModel saves it (to the JSON file)
         Also, prints the id
 
-        Usage: create BaseModel
+        Usage: create <model>
         """
         if not args:
             print("** class name missing **")
