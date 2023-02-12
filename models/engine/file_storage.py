@@ -16,8 +16,10 @@ class FileStorage:
         Generates a string to be used as key for object_id
         Arguments:
             object_id: id of the object (can be omitted if objekt is provided)
-            object_classname: Class name of the object (can be omitted if objekt is provided)
-            objekt: the objekt (can be omitted if object_id and object_classname are provided)
+            object_classname: Class name of the object,
+                            (can be omitted if objekt is provided)
+            objekt: the objekt,
+                (can be omitted if object_id and object_classname are provided)
         Returns:
             A string. This string is empty if certain conditions are not meant.
             Check the Arguments section
@@ -77,8 +79,11 @@ class FileStorage:
             outFile.write('\n')
 
     def reload(self):
-        """Deserializes the JSON file at self.__file_path into self.__objects if
-        the file exists. Raises no error, if the file doesn't exist"""
+        """
+        Deserializes the JSON file at self.__file_path
+        into self.__objects if the file exists.
+        Raises no error, if the file doesn't exist
+        """
 
         if os.path.exists(self.__file_path):
             with open(self.__file_path) as outFile:
@@ -128,10 +133,10 @@ class FileStorage:
         Arguments:
             (key) key: the key of the object to be destroyed
         """
-        status = False # Not deleted yet
+        status = False  # Not deleted yet
         if self.in_storage(key=key):
             self.__objects.pop(key)
             self.save()
-            status = True # Successfully deleted
+            status = True  # Successfully deleted
 
         return status

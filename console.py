@@ -17,7 +17,7 @@ class HBNBCommand(cmd.Cmd):
 
     prompt = '(hbnb) '
     __default_model = 'BaseModel'
-    __models= {
+    __models = {
         'BaseModel': BaseModel,
         'User': User,
         'State': State,
@@ -92,8 +92,10 @@ class HBNBCommand(cmd.Cmd):
     def help_create(self):
         """Prints the helper text for the create command"""
 
-        print("Creates a new instance of model saves it (to the JSON file).",
-              "Also, prints the id.\n\t", "Usage: create <model>\n", sep='\n')
+        print(
+            "Creates a new instance of BaseModel saves it (to the JSON file).",
+            "Also, prints the id.\n\t", "Usage: create BaseModel\n", sep='\n'
+            )
 
     def parse_args(self, args):
         """
@@ -110,10 +112,10 @@ class HBNBCommand(cmd.Cmd):
         Usage: show <classname> <id>
         """
         args_list = self.parse_args(args)
-        if not args_list: # i.e. no extra argument was passed
+        if not args_list:  # i.e. no extra argument was passed
             print("** class name missing **")
         elif len(args_list) != 2:
-            # i.e. extra arguments were given but greater or less than 2 (no id)
+            # i.e. extra arguments were given but greater or less than 2(no id)
             print("** instance id missing **")
         elif not self.model_exists(args_list[0]):
             print("** class doesn't exist **")
@@ -151,8 +153,10 @@ class HBNBCommand(cmd.Cmd):
         if args and not self.model_exists(model_name):
             print("** class doesn't exist **")
         else:
-            model_list = [str(self.use_model(model_name, **model_data))
-                          for model_data in storage.get_all(model_name).values()]
+            model_list = [
+                    str(self.use_model(model_name, **model_data))
+                    for model_data in storage.get_all(model_name).values()
+                    ]
             print(model_list)
 
     def help_all(self):
@@ -164,22 +168,22 @@ class HBNBCommand(cmd.Cmd):
 
     def do_update(self, args):
         """
-        Updates an instance based on the class name and id by adding or updating attribute
-
+        Updates an instance based on the class name
+        and id by adding or updating attribute
         Usage: update <class name> <id> <attribute name> "<attribute value>"
         """
 
         args_list = self.parse_args(args)
 
-        if not args_list: # No extra arguments were passed, i.e. no classname
+        if not args_list:  # No extra arguments were passed, i.e. no classname
             print("** class name missing **")
         elif not self.model_exists(args_list[0]):
             print("** class doesn't exist **")
-        elif len(args_list) < 2: # i.e. id wasn't provided
+        elif len(args_list) < 2:  # i.e. id wasn't provided
             print("** instance id missing **")
-        elif len(args_list) < 3: # i.e. attribute name wasn't provided
+        elif len(args_list) < 3:  # i.e. attribute name wasn't provided
             print("** attribute name missing **")
-        elif len(args_list) < 4: # i.e. value wasn't provided
+        elif len(args_list) < 4:  # i.e. value wasn't provided
             print("** value missing **")
         else:
 
@@ -200,8 +204,8 @@ class HBNBCommand(cmd.Cmd):
     def help_update(self):
         """Prints the help text for the update command"""
 
-        print('Updates an instance based on the class name and id by adding or \
-        updating attribute\n\t', 'Usage: update <class name> <id> \
+        print('Updates an instance based on the class name and id by adding or\
+        updating attribute\n\t', 'Usage: update <class name> <id>\
         <attribute name> "<attribute value>"\n', sep='\n')
 
     def do_destroy(self, args):
@@ -213,18 +217,18 @@ class HBNBCommand(cmd.Cmd):
 
         args_list = self.parse_args(args)
 
-        if not args_list: # No extra arguments were passed, i.e. no classname
+        if not args_list:  # No extra arguments were passed, i.e. no classname
             print("** class name missing **")
         elif not self.model_exists(args_list[0]):
             print("** class doesn't exist **")
-        elif len(args_list) < 2: # i.e. id wasn't provided
+        elif len(args_list) < 2:  # i.e. id wasn't provided
             print("** instance id missing **")
         else:
 
             [model_name, model_id] = args_list
             key = storage.generate_key(model_id, model_name)
             status = storage.destroy_object(key)
-            if not status: # i.e. unable to delete object
+            if not status:  # i.e. unable to delete object
                 print("** no instance found **")
 
     def help_destroy(self):
@@ -235,6 +239,7 @@ class HBNBCommand(cmd.Cmd):
 
         Usage: destroy <class name> <id>
         """)
+
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
