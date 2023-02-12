@@ -78,7 +78,7 @@ class HBNBCommand(cmd.Cmd):
         Creates a new instance of BaseModel saves it (to the JSON file)
         Also, prints the id
 
-        Usage: create BaseModel
+        Usage: create <model>
         """
         if not args:
             print("** class name missing **")
@@ -92,8 +92,8 @@ class HBNBCommand(cmd.Cmd):
     def help_create(self):
         """Prints the helper text for the create command"""
 
-        print("Creates a new instance of BaseModel saves it (to the JSON file).",
-              "Also, prints the id.\n\t", "Usage: create BaseModel\n", sep='\n')
+        print("Creates a new instance of model saves it (to the JSON file).",
+              "Also, prints the id.\n\t", "Usage: create <model>\n", sep='\n')
 
     def parse_args(self, args):
         """
