@@ -21,7 +21,10 @@ class BaseModel:
             storage.new(self)
 
     def __set_attributes(self, attr_dict):
-        """Sets the attributes of a model instance based on **kwargs or default values"""
+        """
+        Sets the attributes of a model instance
+        based on **kwargs or default values
+        """
         attr_dict_new = {}
         for attr, value in attr_dict.items():
             if attr in ['created_at', 'updated_at']:
@@ -37,14 +40,16 @@ class BaseModel:
 
     def __str__(self):
         """The string representation of the object"""
-        return '[{0}] ({1}) {2}'.format(self.__class__.__name__, self.id, self.__dict__)
+        return '[{0}] ({1}) {2}'.format(
+                self.__class__.__name__, self.id, self.__dict__
+                )
 
     def __is_serializable(self, obj):
         """Checks if an object is serializable"""
         try:
             obj_to_string = json.dumps(obj)
             return obj_to_string is not None and isinstance(obj_to_string, str)
-        except:
+        except Exception:
             return False
 
     def save(self):
