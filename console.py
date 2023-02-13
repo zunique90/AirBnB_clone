@@ -124,18 +124,20 @@ class HBNBCommand(cmd.Cmd):
         Parses the argument passed with command,
         returns a list of the arguments
         """
-        return args.split()
-
-    def do_argsy(self, args):
-        """
-        Parses the argument passed with command,
-        returns a list of the arguments
-        """
-        # reg_exp = r'"?([a-zA-Z\s\d-]+)"?'
-        # reg_exp = r'([a-zA-Z\w\d-]+) "([a-zA-Z\S\d-]+)"'
-        # result = re.findall(reg_exp, args)
-        # print(result)
-        return args.split()
+        args_list = args.split()
+        clean_list = []
+        index = 0
+        while index < len(args_list):
+            if '"' in args_list[index] and '"' in args_list[index + 1]:
+                # This means both strings are meant to be one word, not seperate words
+                first_word = args_list[index].strip('"')
+                second_word = args_list[index + 1].strip('"')
+                clean_list.append("{} {}".format(first_word, second_word))
+                index = index + 1
+            else:
+                clean_list.append(args_list[index])
+            index = index + 1
+        return clean_list
 
     def do_show(self, args):
         """
