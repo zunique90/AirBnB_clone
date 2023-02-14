@@ -61,6 +61,20 @@ class FileStorage:
         """
         return {k: v for k, v in self.__objects.items() if _name in k}
 
+    def count_all(self, _name):
+        """
+        Returns the number of objects in the storage that belongs to the `name` model
+        Arguments:
+            _name: the name of the model
+        Returns:
+            (int) the number of instances found
+        """
+        count = 0
+        for key in self.__objects.keys():
+            if _name in key:
+                count = count + 1
+        return count
+
     def new(self, objekt):
         """
         Adds a new item to the __objects dict

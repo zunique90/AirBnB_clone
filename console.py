@@ -2,6 +2,7 @@
 # This is the entry point to the console made for the AirBnB clone
 
 import cmd
+import re
 from models import storage
 from models.base_model import BaseModel
 from models.user import User
@@ -27,6 +28,17 @@ class HBNBCommand(cmd.Cmd):
         'Review': Review
     }
 
+    def __init__(self, *args, **kwargs):
+        self.__method_map = {
+            'show': self.show_model,
+            'all': self.print_all,
+            'count': self.count_all,
+            'destroy': self.destroy_model,
+            'update': self.update_model
+        }
+
+        super().__init__(*args, **kwargs)
+
     def use_model(self, _name, *args, **kwargs):
         """
         Gets the right model to be used based on _name
@@ -46,6 +58,16 @@ class HBNBCommand(cmd.Cmd):
             True if model exists else False
         """
         return name in self.__models
+
+    def method_allowed(self, name):
+        """
+        Checks if a method is allowed
+        Arguments:
+            name: the name of the method
+        Returns:
+            True if method is allowed else False
+        """
+        return name in self.__method_map
 
     def do_quit(self, arg):
         """
@@ -102,7 +124,20 @@ class HBNBCommand(cmd.Cmd):
         Parses the argument passed with command,
         returns a list of the arguments
         """
-        return args.split()
+        args_list = args.split()
+        clean_list = []
+        index = 0
+        while index < len(args_list):
+            if '"' in args_list[index] and '"' in args_list[index + 1]:
+                # This means both strings are meant to be one word, not seperate words
+                first_word = args_list[index].strip('"')
+                second_word = args_list[index + 1].strip('"')
+                clean_list.append("{} {}".format(first_word, second_word))
+                index = index + 1
+            else:
+                clean_list.append(args_list[index])
+            index = index + 1
+        return clean_list
 
     def do_show(self, args):
         """
@@ -112,6 +147,16 @@ class HBNBCommand(cmd.Cmd):
         Usage: show <classname> <id>
         """
         args_list = self.parse_args(args)
+        self.show_model(args_list)
+        
+    def show_model(self, args_list):
+        """
+        Prints the string representation of an instance
+        based on the class name and id
+        Arguments:
+            (list) args_list: A list containing the model_name and the id.
+                              [model_name, id]
+        """
         if not args_list:  # i.e. no extra argument was passed
             print("** class name missing **")
         elif len(args_list) != 2:
@@ -120,7 +165,7 @@ class HBNBCommand(cmd.Cmd):
         elif not self.model_exists(args_list[0]):
             print("** class doesn't exist **")
         else:
-            [model_name, model_id] = args_list
+            [model_name, model_id] = args_list[:2]
             model_data = storage.get_object(model_id, model_name)
             if model_data:
                 model = self.use_model(model_name, **model_data)
@@ -144,19 +189,27 @@ class HBNBCommand(cmd.Cmd):
         """
 
         args_list = self.parse_args(args)
-
         model_name = self.__default_model
         if args and isinstance(args_list, list):
-            print('is list')
             model_name = args_list[0]
+        self.print_all([model_name])
 
-        if args and not self.model_exists(model_name):
+    def print_all(self, args_list):
+        """
+        Prints the string representation of all instances 
+        of model based on model_name
+        Arguments:
+            (list) args_list: A list containing the model_name.
+                              [model_name]
+        """
+        model_name = args_list[0]
+        if not self.model_exists(model_name):
             print("** class doesn't exist **")
         else:
             model_list = [
-                    str(self.use_model(model_name, **model_data))
-                    for model_data in storage.get_all(model_name).values()
-                    ]
+                str(self.use_model(model_name, **model_data))
+                for model_data in storage.get_all(model_name).values()
+            ]
             print(model_list)
 
     def help_all(self):
@@ -174,7 +227,16 @@ class HBNBCommand(cmd.Cmd):
         """
 
         args_list = self.parse_args(args)
+        self.update_model(args_list)
 
+    def update_model(self, args_list):
+        """
+        Updates an instance based on the class name
+        and id by adding or updating attribute
+        Arguments:
+            (list) args_list: A list containing the model_name, id, attribute and value.
+                              [model_name, id, attr, value]
+        """
         if not args_list:  # No extra arguments were passed, i.e. no classname
             print("** class name missing **")
         elif not self.model_exists(args_list[0]):
@@ -216,7 +278,15 @@ class HBNBCommand(cmd.Cmd):
         """
 
         args_list = self.parse_args(args)
+        self.destroy_model(args_list)
 
+    def destroy_model(self, args_list):
+        """
+        Removes an instance from storage based on the model name and id
+        Arguments:
+            (list) args_list: A list containing the model_name and the id.
+                              [model_name, id]
+        """
         if not args_list:  # No extra arguments were passed, i.e. no classname
             print("** class name missing **")
         elif not self.model_exists(args_list[0]):
@@ -225,7 +295,7 @@ class HBNBCommand(cmd.Cmd):
             print("** instance id missing **")
         else:
 
-            [model_name, model_id] = args_list
+            [model_name, model_id] = args_list[:2]
             key = storage.generate_key(model_id, model_name)
             status = storage.destroy_object(key)
             if not status:  # i.e. unable to delete object
@@ -239,6 +309,57 @@ class HBNBCommand(cmd.Cmd):
 
         Usage: destroy <class name> <id>
         """)
+
+    def default(self, args):
+        """Runs when an unrecognised command is passed to console"""
+        result = self.parse_unrecognised_command(args)
+        if not result:
+            super().default(args)
+        elif self.method_allowed(result['method']):
+            args_list = [result['model'], *result['args']]
+            method = result['method']
+            method_call = self.__method_map[method]
+            method_call(args_list)
+        else:
+            super().default(args)
+
+    def parse_unrecognised_command(self, line):
+        """Parses an unrecognised command and returns all parameters"""
+        result = {
+            "model": None,
+            "method": None,
+            "args": []
+        }
+
+        # this regular expression seperates the string into three segments
+        # (1).(2).(3)
+        reg_exp = r"(\S+)\.([a-z]+)\((.*)\)"
+        res = re.search(reg_exp, line)
+        if res:
+            reg_exp_2 = r'"?([a-zA-Z\s\d-]+)"?'
+            result['model'] = res.groups()[0]
+            result['method'] = res.groups()[1]
+
+            # this regular expression seperates the arguments into seperate words
+            res_1 = re.findall(reg_exp_2, res.groups()[2])
+            if res_1:
+                result['args'] = [x.rstrip().lstrip() for x in res_1 if x.strip()]
+
+            print(result)
+        return result
+
+    def count_all(self, args_list):
+        """
+        Prints the number of instances of model in storage based on model_name
+        Arguments:
+            (list) args_list: A list containing the model_name. [model_name]
+        """
+        model_name = args_list[0]
+        if not self.model_exists(model_name):
+            print("** class doesn't exist **")
+        else:
+            count = storage.count_all(model_name)
+            print(count)
 
 
 if __name__ == '__main__':
