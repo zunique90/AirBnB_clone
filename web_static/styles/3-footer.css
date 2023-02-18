@@ -3,9 +3,10 @@ footer {
     width: 100%;
     display: grid;
     place-content: center;
-    position: absolute;
+    position: fixed;
     bottom: 0;
     z-index: 10;
     border-top: 1px solid #CCCCCC;
-    /* color: white; */
+    background-color: white;
+    
 }
